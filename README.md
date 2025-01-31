@@ -11,6 +11,6 @@ It returns a table[setting]
 
 ### Module
 
-NAME: <string> -- name of module
-DESC: <string> -- description
+```
 limit: <500> -- Limits the amount of lines to search for identifying tab settings
+```
