@@ -1,0 +1,8 @@
+
+Support EOF vim settings like so
+// vim: tw=0 expandtab tabstop=4 softtabstop=4 shiftwidth=4
+instead of vim: just identify that a = or some keys are used (same ones from win.options
+
+How to turn off? vis.options.tabautoconf?
+
+use win.options instead of vis:command
