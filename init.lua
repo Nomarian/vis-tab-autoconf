@@ -9,12 +9,10 @@ local M = {
 	NAME = "tabautoconf"
 	,DESC = "Inherits settings from current file and auto configure"
 
-	,tabwidth = 8 -- tw is guessed from the file
+	,spacelimit = 8 -- tw is guessed from the file
 
 	,search_limit = 500 -- lines to search
 	-- set to math.huge to search completely
-
-	,active = true
 }
 
 local string = string
@@ -44,21 +42,22 @@ end
 local examine_head = function (file)
 	local NR = 0
 	local search_limit = M.search_limit
-	local tw = M.tabwidth
+	local tw = M.spacelimit
 	for line in file:lines_iterator() do
 		NR = NR + 1
 		local indent = line:match"^%s+"
 		if indent then
-			local expandtab = "off"
 			local _, count = indent:gsub(" ", "")
-			if count>0 then
-				expandtab = "on"
+			if count==0 then -- tab
+				vis:command"set expandtab off"
+				return true
+			elseif count>0 then
+				vis:command"set expandtab on"
 				if count<=tw then
 					vis:command("set tabwidth " .. count)
+					return true
 				end
 			end
-			vis:command("set expandtab " .. expandtab)
-			return true
 		end
 		if NR>search_limit then
 			break
