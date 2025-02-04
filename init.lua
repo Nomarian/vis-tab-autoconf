@@ -18,20 +18,22 @@ local M = {
 local string = string
 
 -- win.options but because there's no win.options we have to remake it here
-local all_options = {
+local acceptable_options = {
 	expand=true, et=true
-	,colorcolumn=true, cc=true
 	,tabwidth=true, tw=true
---	,["show-tabs"]=true
 }
 
-local examine_line = function (line)
-	line = line:match"^%g+%s+vim:%s+(.+)"
+local examine_modeline = function (line)
+	line = line:match"^%g*%s*vim?:%s*(.+)"
+		or line:match"^%g*%s*ex:%s+(.+)"
 	if line==nil then return nil end
-	if all_options[ line:match"[^=%s]+" ]==nil then return nil end
+	if acceptable_options[ line:match"[^=%s]+" ]==nil then return nil end
 	local result = false
 	for word, key, val in line:gmatch"(([^=%s]+)=?([^=%s]*))" do
-		if all_options[key] then
+		if acceptable_options[key] then
+			if val~="" then
+				word = key .. " " .. val
+			end
 			vis:command("set " .. word)
 			result = true
 		end
@@ -76,8 +78,9 @@ local on_win_open = function (win)
 	if #lines==0 then return end
 
 	local _ =
-		examine_line(lines[#lines])
-		or examine_line(lines[2])
+		examine_modeline(lines[#lines])
+		or #lines>1 and examine_modeline(lines[2])
+		or #lines>2 and examine_modeline(lines[3])
 		or examine_head(file)
 end
 M.on_win_open = on_win_open
